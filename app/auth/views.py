@@ -2,7 +2,7 @@ from flask import jsonify, request, session
 
 from . import auth
 from .models import Users
-from .. import db
+from database import db
 
 
 @auth.route('/users', methods=['POST'])
@@ -47,8 +47,8 @@ def delete_user(id):
 @auth.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    if Users.query.filter_by(username=data['username']).first():
-        return jsonify({'message': 'Username already exists'}), 400
+    if Users.query.filter_by(email=data['email']).first():
+        return jsonify({'message': 'Email already exists'}), 400
     new_user = Users(username=data['username'], email=data['email'])
     new_user.set_password(data['password'])
     db.session.add(new_user)
@@ -59,8 +59,8 @@ def register():
 @auth.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    user = Users.query.filter_by(username=data['username']).first()
+    user = Users.query.filter_by(email=data['email']).first()
     if user is None or not user.check_password(data['password']):
-        return jsonify({'message': 'Invalid username or password'}), 400
+        return jsonify({'message': 'Invalid email or password'}), 400
     session['user_id'] = user.id
     return jsonify({'message': 'User logged in'}), 200
