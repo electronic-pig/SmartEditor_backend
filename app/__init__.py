@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 from dotenv import load_dotenv
 from flask import Flask
@@ -16,6 +17,7 @@ def create_app():
 
     load_dotenv()  # 加载 .env 文件
     app.secret_key = os.getenv('SECRET_KEY')
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
     app.config['MAIL_SERVER'] = 'smtp.qq.com'
     app.config['MAIL_PORT'] = 465
