@@ -15,7 +15,7 @@ def create_app():
     app = Flask(__name__)
     CORS(app, supports_credentials=True)  # 允许跨域请求
 
-    load_dotenv()  # 加载 .env 文件
+    load_dotenv()  # 加载 .env 文件(存储敏感信息)
     app.secret_key = os.getenv('SECRET_KEY')
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
