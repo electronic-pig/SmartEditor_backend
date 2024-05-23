@@ -1,19 +1,32 @@
+import os
+
+from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
-from .main import main as main_blueprint
-from .auth import auth as auth_blueprint
+
 from database import db
+from mail import mail
+from .auth import auth as auth_blueprint
+from .main import main as main_blueprint
 
 
 def create_app():
     app = Flask(__name__)
-    CORS(app, supports_credentials=True)
-    app.secret_key = 'my secret key'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:aliserver@47.236.92.108:3306/smart_editor'
+    CORS(app, supports_credentials=True)  # 允许跨域请求
 
-    db.init_app(app)
+    load_dotenv()  # 加载 .env 文件
+    app.secret_key = os.getenv('SECRET_KEY')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+    app.config['MAIL_SERVER'] = 'smtp.qq.com'
+    app.config['MAIL_PORT'] = 465
+    app.config['MAIL_USE_SSL'] = True
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
-    app.register_blueprint(main_blueprint)
-    app.register_blueprint(auth_blueprint, url_prefix='/auth')
+    db.init_app(app)  # 创建数据库连接
+    mail.init_app(app)  # 创建邮件客户端连接
+
+    app.register_blueprint(main_blueprint)  # 注册蓝图
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')  # 注册蓝图
 
     return app
