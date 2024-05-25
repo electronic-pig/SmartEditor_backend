@@ -8,7 +8,7 @@ from flask_cors import CORS
 from database import db
 from mail import mail
 from .auth import auth as auth_blueprint
-from .main import main as main_blueprint
+from .document import document as document_blueprint
 
 
 def create_app():
@@ -28,7 +28,7 @@ def create_app():
     db.init_app(app)  # 创建数据库连接
     mail.init_app(app)  # 创建邮件客户端连接
 
-    app.register_blueprint(main_blueprint)  # 注册蓝图
     app.register_blueprint(auth_blueprint, url_prefix='/auth')  # 注册蓝图
+    app.register_blueprint(document_blueprint, url_prefix='/document')  # 注册蓝图
 
     return app
