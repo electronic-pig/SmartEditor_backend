@@ -19,7 +19,7 @@ def get_document(document_id):
     doc = Documents.query.get(document_id)
     if doc is None:
         return jsonify({'message': 'Document not found!', 'code': '400'})
-    return jsonify({'title': doc.title, 'content': doc.content, 'code': '200'})
+    return jsonify({'document': doc.to_dict(), 'code': '200'})
 
 
 @document.route('/user/<int:user_id>', methods=['GET'])
@@ -27,7 +27,7 @@ def get_documents_by_user(user_id):
     docs = Documents.query.filter_by(user_id=user_id).all()
     if not docs:
         return jsonify({'message': 'No documents found for this user!', 'code': '400'})
-    return jsonify({'documents': [{'id': doc.id, 'title': doc.title, 'content': doc.content} for doc in docs], 'code': '200'})
+    return jsonify({'documents': [doc.to_dict() for doc in docs], 'code': '200'})
 
 
 @document.route('/<int:document_id>', methods=['PUT'])
