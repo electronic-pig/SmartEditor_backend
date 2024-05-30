@@ -95,6 +95,7 @@ def delete_document_logic(document_id):
     if doc is None:
         return jsonify({'message': 'Document not found!', 'code': '400'})
     doc.is_deleted = True
+    doc.is_favorite = False
     db.session.commit()
     return jsonify({'message': 'Document deleted!', 'code': '200'})
 

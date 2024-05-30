@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
 
-from database import db
+from database import *
 from mail import mail
 from .auth import auth as auth_blueprint
 from .document import document as document_blueprint
@@ -19,6 +19,7 @@ def create_app():
     app.secret_key = os.getenv('SECRET_KEY')
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+    app.config['REDIS_URL'] = os.getenv('REDIS_DATABASE_URI')
     app.config['MAIL_SERVER'] = 'smtp.qq.com'
     app.config['MAIL_PORT'] = 465
     app.config['MAIL_USE_SSL'] = True
@@ -26,6 +27,7 @@ def create_app():
     app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
     db.init_app(app)  # 创建数据库连接
+    redis_client.init_app(app)  # 创建 Redis 连接
     mail.init_app(app)  # 创建邮件客户端连接
 
     app.register_blueprint(auth_blueprint, url_prefix='/auth')  # 注册蓝图

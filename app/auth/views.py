@@ -1,8 +1,11 @@
 import os
 import random
 import string
+import datetime
 
+import jwt
 from captcha.image import ImageCaptcha
+from flask import current_app
 from flask import jsonify, request, session, make_response
 from flask_mail import Message
 
@@ -10,6 +13,25 @@ from database import db
 from mail import mail
 from . import auth
 from .models import Users
+
+
+# 在用户登录成功后，生成一个 JWT
+def generate_jwt(user_id):
+    payload = {
+        'user_id': user_id,
+        'exp': datetime.datetime.now() + datetime.timedelta(hours=24)
+    }
+    token = jwt.encode(payload, current_app.secret_key, algorithm='HS256')
+    return token
+
+
+# 在需要授权的视图函数中，验证 JWT
+def verify_jwt(token):
+    try:
+        payload = jwt.decode(token, current_app.secret_key, algorithms=['HS256'])
+        return payload['user_id']
+    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+        return None
 
 
 @auth.route('/varify/<string:username>&<string:email>')
