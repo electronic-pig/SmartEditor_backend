@@ -1,46 +1,22 @@
 import os
 import random
-import string
-import datetime
 
-import jwt
-from captcha.image import ImageCaptcha
-from flask import current_app
-from flask import jsonify, request, session, make_response
+from flask import jsonify, request
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_mail import Message
 
-from database import db
+from database import *
 from mail import mail
 from . import auth
 from .models import Users
-
-
-# 在用户登录成功后，生成一个 JWT
-def generate_jwt(user_id):
-    payload = {
-        'user_id': user_id,
-        'exp': datetime.datetime.now() + datetime.timedelta(hours=24)
-    }
-    token = jwt.encode(payload, current_app.secret_key, algorithm='HS256')
-    return token
-
-
-# 在需要授权的视图函数中，验证 JWT
-def verify_jwt(token):
-    try:
-        payload = jwt.decode(token, current_app.secret_key, algorithms=['HS256'])
-        return payload['user_id']
-    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
-        return None
 
 
 @auth.route('/varify/<string:username>&<string:email>')
 def varify(username, email):
     # 生成一个6位数的验证码
     verification_code = str(random.randint(100000, 999999))
-    session.permanent = True
-    session['verification_code'] = verification_code
-    print(session)
+    # 将验证码和用户的邮箱一起存储到 Redis 中
+    redis_client.setex(f'verification_code:{email}', 300, verification_code)
     # 创建邮件消息
     msg = Message('【妙笔】用户注册邮箱验证', sender=os.getenv('MAIL_USERNAME'), recipients=[email])
     msg.body = ('Hi，【{}】：\n\n您正尝试通过本邮箱接收注册【妙笔】时所需的验证码。\n\n'
@@ -50,28 +26,13 @@ def varify(username, email):
     return jsonify({'message': '验证码已发送，请注意查收！', 'code': 200})
 
 
-@auth.route('/captcha')
-def captcha():
-    # 生成随机的验证码
-    captcha_text = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-    # 将验证码存储到 session 中
-    session['captcha'] = captcha_text
-    print(session)
-    # 生成验证码图片
-    image = ImageCaptcha()
-    image_data = image.generate(captcha_text)
-    # 创建响应对象并设置响应头，以便浏览器将其作为图片处理
-    response = make_response(image_data.getvalue())
-    response.headers['Content-Type'] = 'image/png'
-    return response
-
-
 @auth.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    print(session)
+    # 从 Redis 中获取验证码
+    verification_code = redis_client.get(f'verification_code:{data["email"]}')
     # 验证验证码
-    if 'verification_code' not in session or data['verification_code'] != session['verification_code']:
+    if verification_code is None or data['verification_code'] != verification_code:
         return jsonify({'message': '验证码错误或已失效！', 'code': 400})
     # 验证邮箱是否已被注册
     if Users.query.filter_by(email=data['email']).first():
@@ -87,10 +48,6 @@ def register():
 @auth.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    print(session)
-    # 验证验证码
-    if 'captcha' not in session or data['captcha'].upper() != session['captcha']:
-        return jsonify({'message': '验证码错误！', 'code': 400})
     # 验证用户是否存在
     user = Users.query.filter_by(email=data['email']).first()
     if user is None:
@@ -98,5 +55,16 @@ def login():
     # 验证密码是否正确
     if not user.check_password(data['password']):
         return jsonify({'message': '密码错误！', 'code': 400})
-    session['user_id'] = user.id
-    return jsonify({'message': '用户登录成功！', 'code': 200})
+    # 用户登录成功，生成 JWT
+    access_token = create_access_token(identity=user.id)
+    # 将 JWT 发送给前端
+    return jsonify({'message': '用户登录成功！', 'code': 200,
+                    'data': {'access_token': access_token, 'username': user.username}})
+
+
+@auth.route("/protected", methods=["GET"])
+@jwt_required()  # 这个装饰器要求请求必须携带有效的JWT令牌
+def protected():
+    # 使用get_jwt_identity访问当前用户的身份
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user)
