@@ -18,7 +18,7 @@ def create_app():
 
     load_dotenv()  # 加载 .env 文件(存储敏感信息)
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET')
-    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)  # 设置ACCESS_TOKEN的默认过期时间为1小时
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=6)  # 设置ACCESS_TOKEN的默认过期时间为6小时
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
     app.config['REDIS_URL'] = os.getenv('REDIS_DATABASE_URI')
     app.config['MAIL_SERVER'] = 'smtp.qq.com'

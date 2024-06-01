@@ -1,4 +1,5 @@
 from flask import request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from database import db
 from . import document
@@ -7,9 +8,11 @@ from .models import Documents
 
 # 创建文档
 @document.route('/', methods=['POST'])
+@jwt_required()
 def create_document():
+    user_id = get_jwt_identity()
     data = request.get_json()
-    new_document = Documents(user_id=data['user_id'], title=data['title'], content=data['content'])
+    new_document = Documents(user_id=user_id, title=data['title'], content=data['content'])
     db.session.add(new_document)
     db.session.commit()
     return jsonify({'message': 'Document created!', 'code': '200'})
@@ -17,6 +20,7 @@ def create_document():
 
 # 查询单个文档
 @document.route('/<int:document_id>', methods=['GET'])
+@jwt_required()
 def get_document(document_id):
     doc = Documents.query.get(document_id)
     if doc is None:
@@ -25,8 +29,10 @@ def get_document(document_id):
 
 
 # 查询用户的所有文档
-@document.route('/user/<int:user_id>', methods=['GET'])
-def get_documents_by_user(user_id):
+@document.route('/user', methods=['GET'])
+@jwt_required()
+def get_documents_by_user():
+    user_id = get_jwt_identity()
     docs = Documents.query.filter_by(user_id=user_id, is_deleted=False).all()
     if not docs:
         return jsonify({'message': 'No documents found for this user!', 'code': '400'})
@@ -35,6 +41,7 @@ def get_documents_by_user(user_id):
 
 # 更新文档
 @document.route('/<int:document_id>', methods=['PUT'])
+@jwt_required()
 def update_document(document_id):
     data = request.get_json()
     doc = Documents.query.get(document_id)
@@ -48,6 +55,7 @@ def update_document(document_id):
 
 # 物理删除文档
 @document.route('/<int:document_id>', methods=['DELETE'])
+@jwt_required()
 def delete_document(document_id):
     doc = Documents.query.get(document_id)
     if doc is None:
@@ -59,6 +67,7 @@ def delete_document(document_id):
 
 # 收藏文档
 @document.route('/favorite/<int:document_id>', methods=['PUT'])
+@jwt_required()
 def favorite_document(document_id):
     doc = Documents.query.get(document_id)
     if doc is None:
@@ -70,6 +79,7 @@ def favorite_document(document_id):
 
 # 取消收藏文档
 @document.route('/unfavorite/<int:document_id>', methods=['PUT'])
+@jwt_required()
 def unfavorite_document(document_id):
     doc = Documents.query.get(document_id)
     if doc is None:
@@ -80,8 +90,10 @@ def unfavorite_document(document_id):
 
 
 # 查询用户的所有收藏文档
-@document.route('/favorites/user/<int:user_id>', methods=['GET'])
-def get_favorite_documents(user_id):
+@document.route('/favorites/user', methods=['GET'])
+@jwt_required()
+def get_favorite_documents():
+    user_id = get_jwt_identity()
     docs = Documents.query.filter_by(user_id=user_id, is_favorite=True).all()
     if not docs:
         return jsonify({'message': 'No favorite documents found for this user!', 'code': '400'})
@@ -90,6 +102,7 @@ def get_favorite_documents(user_id):
 
 # 逻辑删除文档
 @document.route('/delete/<int:document_id>', methods=['PUT'])
+@jwt_required()
 def delete_document_logic(document_id):
     doc = Documents.query.get(document_id)
     if doc is None:
@@ -102,6 +115,7 @@ def delete_document_logic(document_id):
 
 # 恢复逻辑删除的文档
 @document.route('/recover/<int:document_id>', methods=['PUT'])
+@jwt_required()
 def recover_document(document_id):
     doc = Documents.query.get(document_id)
     if doc is None:
@@ -112,8 +126,10 @@ def recover_document(document_id):
 
 
 # 查询用户的所有逻辑删除的文档
-@document.route('/deleted/user/<int:user_id>', methods=['GET'])
-def get_deleted_documents(user_id):
+@document.route('/deleted/user', methods=['GET'])
+@jwt_required()
+def get_deleted_documents():
+    user_id = get_jwt_identity()
     docs = Documents.query.filter_by(user_id=user_id, is_deleted=True).all()
     if not docs:
         return jsonify({'message': 'No deleted documents found for this user!', 'code': '400'})
