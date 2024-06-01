@@ -134,3 +134,12 @@ def get_deleted_documents():
     if not docs:
         return jsonify({'message': 'No deleted documents found for this user!', 'code': '400'})
     return jsonify({'documents': [doc.to_dict() for doc in docs], 'code': '200'})
+
+
+# 查询文档模板
+@document.route('/template', methods=['GET'])
+def get_document_template():
+    docs = Documents.query.filter_by(user_id=1).all()
+    if not docs:
+        return jsonify({'message': 'No document template found!', 'code': '400'})
+    return jsonify({'document': [doc.to_dict() for doc in docs], 'code': '200'})

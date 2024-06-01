@@ -59,7 +59,45 @@ def login():
     access_token = create_access_token(identity=user.id)
     # 将 JWT 发送给前端
     return jsonify({'message': '用户登录成功！', 'code': 200,
-                    'data': {'access_token': access_token, 'username': user.username}})
+                    'data': {'access_token': access_token, 'username': user.username, 'email': user.email}})
+
+
+@auth.route("/reset_varify", methods=["GET"])
+@jwt_required()
+def reset_varify():
+    # 使用get_jwt_identity访问当前用户的身份
+    current_user = get_jwt_identity()
+    user = Users.query.get(current_user)
+    email = user.email
+    # 生成一个6位数的验证码
+    verification_code = str(random.randint(100000, 999999))
+    # 将验证码和用户的邮箱一起存储到 Redis 中
+    redis_client.setex(f'verification_code:{email}', 300, verification_code)
+    # 创建邮件消息
+    msg = Message('【妙笔】用户密码重置', sender=os.getenv('MAIL_USERNAME'), recipients=[email])
+    msg.body = ('Hi，【{}】：\n\n您正尝试通过本邮箱重置【妙笔】时所需的验证码。\n\n'
+                '验证码：【{}】，5分钟内有效，如非本人操作，请忽略本邮件。').format(user.username, verification_code)
+    # 发送邮件
+    mail.send(msg)
+    return jsonify({'message': '验证码已发送，请注意查收！', 'code': 200})
+
+
+@auth.route("/reset_password", methods=["POST"])
+@jwt_required()
+def reset_password():
+    current_user = get_jwt_identity()
+    user = Users.query.get(current_user)
+    email = user.email
+    data = request.get_json()
+    # 从 Redis 中获取验证码
+    verification_code = redis_client.get(f'verification_code:{email}')
+    # 验证验证码
+    if verification_code is None or data['verification_code'] != verification_code:
+        return jsonify({'message': '验证码错误或已失效！', 'code': 400})
+    # 重置用户密码
+    user.set_password(data['password'])
+    db.session.commit()
+    return jsonify({'message': '用户密码重置成功！', 'code': 200})
 
 
 @auth.route("/protected", methods=["GET"])
