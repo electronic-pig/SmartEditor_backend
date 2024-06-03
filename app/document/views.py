@@ -143,3 +143,14 @@ def get_document_template():
     if not docs:
         return jsonify({'message': 'No document template found!', 'code': '400'})
     return jsonify({'document': [doc.to_dict() for doc in docs], 'code': '200'})
+
+
+# 根据用户的查询参数进行模糊查询
+@document.route('/search/<string:title>', methods=['GET'])
+@jwt_required()
+def search_documents_by_user(title):
+    user_id = get_jwt_identity()
+    docs = Documents.query.filter(Documents.user_id == user_id, Documents.title.like(f"%{title}%")).all()
+    if not docs:
+        return jsonify({'message': 'No documents found with this title for this user!', 'code': '400'})
+    return jsonify({'documents': [doc.to_dict() for doc in docs], 'code': '200'})
