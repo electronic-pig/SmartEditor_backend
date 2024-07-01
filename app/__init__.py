@@ -9,6 +9,7 @@ from database import *
 from mail import mail
 from .auth import auth as auth_blueprint
 from .document import document as document_blueprint
+from .function import function as function_blueprint
 
 
 def create_app():
@@ -33,5 +34,6 @@ def create_app():
 
     app.register_blueprint(auth_blueprint, url_prefix='/auth')  # 注册蓝图
     app.register_blueprint(document_blueprint, url_prefix='/document')  # 注册蓝图
+    app.register_blueprint(function_blueprint, url_prefix='/function')  # 注册蓝图
 
     return app
