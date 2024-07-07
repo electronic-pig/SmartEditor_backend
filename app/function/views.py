@@ -1,10 +1,13 @@
 import os
 from time import sleep
-
+from dotenv import load_dotenv
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-
+import erniebot
 from . import function
+
+erniebot.api_type = "aistudio"
+erniebot.access_token = os.getenv('ERNIE_BOT_ACCESS_TOKEN')
 
 
 @function.route('/ocr', methods=['POST'])
@@ -28,15 +31,24 @@ def ocr():
     return jsonify({'message': 'OCR返回文本结果测试!', 'code': 200})
 
 
-@function.route('/aiTest', methods=['POST'])
+@function.route('/AIFunc', methods=['POST'])
 # @jwt_required()
-def aiTest():
+def AIFunc():
     # user_id = get_jwt_identity()
     data = request.get_json()
-    print(data)
-    sleep(2)
-    reply = '''我是一个基于大规模语言模型的AI，设计来理解和生成文本。
-    我的训绀和知识是由多种数据源累积而成，截止到我最后一次更新的知识都在2023年。
-    我可以帮助解答问题、提供信息、撰写文章等。如果你有任何问题或需求，随时可以问我。'''
+    command = data['command']
+    text = data['text']
+    prompt = ""
+    if command == '续写':
+        prompt = "请帮我续写以下内容，仅返回生成内容" + text
+    elif command == '润色':
+        prompt = "请帮我润色以下内容，仅返回生成内容" + text
+    elif command == '校对':
+        prompt = "请帮我校对以下内容，仅返回生成内容" + text
+    elif command == '翻译':
+        prompt = "请帮我翻译以下内容，仅返回生成内容" + text
 
-    return jsonify({'message': data, 'code': 200})
+    response = erniebot.ChatCompletion.create(model="ernie-3.5",
+                                              messages=[{"role": "user", "content": prompt}])
+
+    return jsonify({'message': response.get_result(), 'code': 200})
