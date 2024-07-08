@@ -7,15 +7,14 @@ from .models import Documents
 
 
 # 创建文档
-@document.route('/', methods=['POST'])
+@document.route('', methods=['POST'])
 @jwt_required()
 def create_document():
     user_id = get_jwt_identity()
-    data = request.get_json()
-    new_document = Documents(user_id=user_id, title=data['title'], content=data['content'])
+    new_document = Documents(user_id=user_id, title='未命名文档', content='')
     db.session.add(new_document)
     db.session.commit()
-    return jsonify({'message': 'Document created!', 'code': '200'})
+    return jsonify({'message': 'Document created!', 'id': new_document.id, 'code': '200'})
 
 
 # 查询单个文档
