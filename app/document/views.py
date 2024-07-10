@@ -11,7 +11,9 @@ from .models import Documents
 @jwt_required()
 def create_document():
     user_id = get_jwt_identity()
-    new_document = Documents(user_id=user_id, title='未命名文档', content='')
+    data = request.get_json()
+    content = data['content'] if 'content' in data else ''  # 如果没有content字段，则默认为空字符串
+    new_document = Documents(user_id=user_id, title='未命名文档', content=content)
     db.session.add(new_document)
     db.session.commit()
     return jsonify({'message': 'Document created!', 'id': new_document.id, 'code': '200'})
@@ -135,13 +137,13 @@ def get_deleted_documents():
     return jsonify({'documents': [doc.to_dict() for doc in docs], 'code': '200'})
 
 
-# 查询文档模板
+# 查询模板库文档
 @document.route('/template', methods=['GET'])
 def get_document_template():
     docs = Documents.query.filter_by(user_id=1).all()
     if not docs:
         return jsonify({'message': 'No document template found!', 'code': '400'})
-    return jsonify({'document': [doc.to_dict() for doc in docs], 'code': '200'})
+    return jsonify({'documents': [doc.to_dict() for doc in docs], 'code': '200'})
 
 
 # 根据用户的查询参数进行模糊查询
@@ -153,3 +155,39 @@ def search_documents_by_user(title):
     if not docs:
         return jsonify({'message': 'No documents found with this title for this user!', 'code': '400'})
     return jsonify({'documents': [doc.to_dict() for doc in docs], 'code': '200'})
+
+
+# 查询用户的模板文档
+@document.route('/template/user', methods=['GET'])
+@jwt_required()
+def get_template_documents_by_user():
+    user_id = get_jwt_identity()
+    docs = Documents.query.filter_by(user_id=user_id, is_template=True, is_deleted=False).all()
+    if not docs:
+        return jsonify({'message': 'No template documents found for this user!', 'code': '400'})
+    return jsonify({'documents': [doc.to_dict() for doc in docs], 'code': '200'})
+
+
+# 将文档设置为模板
+@document.route('/template/<int:document_id>', methods=['PUT'])
+@jwt_required()
+def set_document_template(document_id):
+    doc = Documents.query.get(document_id)
+    if doc is None:
+        return jsonify({'message': 'Document not found!', 'code': '400'})
+    doc.is_template = True
+    db.session.commit()
+    return jsonify({'message': 'Document set as template!', 'code': '200'})
+
+
+# 将模板文档取消模板
+@document.route('/untemplate/<int:document_id>', methods=['PUT'])
+@jwt_required()
+def unset_document_template(document_id):
+    doc = Documents.query.get(document_id)
+    if doc is None:
+        return jsonify({'message': 'Document not found!', 'code': '400'})
+    doc.is_template = False
+    db.session.commit()
+    return jsonify({'message': 'Document unset as template!', 'code': '200'})
+

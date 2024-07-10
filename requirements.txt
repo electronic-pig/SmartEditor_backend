@@ -4,3 +4,9 @@ Flask-SQLAlchemy==3.1.1
 PyMySQL==1.1.1
 python-dotenv==1.0.1
 erniebot==0.5.8
+PyJWT==2.8.0
+flask_cors==4.0.1
+flask_jwt_extended==4.6.0
+flask_mail==0.10.0
+flask_redis==0.4.0
+redis==5.0.7

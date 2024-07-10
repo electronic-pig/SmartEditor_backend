@@ -10,6 +10,7 @@ class Documents(db.Model):
     updated_at = db.Column(db.DateTime, nullable=False)
     is_favorite = db.Column(db.Boolean, default=False)  # 表示文档是否被收藏
     is_deleted = db.Column(db.Boolean, default=False)  # 表示文档是否被逻辑删除
+    is_template = db.Column(db.Boolean, default=False)  # 表示文档是否为模板
 
     def __repr__(self):
         return '<Document %r>' % self.title
