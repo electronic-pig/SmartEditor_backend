@@ -12,34 +12,49 @@ erniebot.access_token = os.getenv('ERNIE_BOT_ACCESS_TOKEN')
 
 
 @function.route('/ocr', methods=['POST'])
-# @jwt_required()
+@jwt_required()
 def ocr():
-    # user_id = get_jwt_identity()
-
     # 检查是否有文件被上传
     if 'file' not in request.files:
-        return jsonify({'message': 'No file part in the request', 'code': 400})
+        return jsonify({'message': '无文件上传!', 'code': 400})
 
     file = request.files['file']
 
     # 如果用户没有选择文件，浏览器也会提交一个空的文件部分，所以需要检查文件是否存在
     if file.filename == '':
-        return jsonify({'message': 'No selected file', 'code': 400})
+        return jsonify({'message': '无文件上传!', 'code': 400})
 
     # 保存文件
-    file.save(os.path.join('./static/uploads', file.filename))
+    # file.save(os.path.join('./static/uploads', file.filename))
 
     return jsonify({'message': 'OCR返回文本结果测试!', 'code': 200})
+
+
+@function.route('/asr', methods=['POST'])
+@jwt_required()
+def asr():
+    # 检查是否有文件被上传
+    if 'file' not in request.files:
+        return jsonify({'message': '无文件上传!', 'code': 400})
+
+    file = request.files['file']
+
+    # 如果用户没有选择文件，浏览器也会提交一个空的文件部分，所以需要检查文件是否存在
+    if file.filename == '':
+        return jsonify({'message': '无文件上传!', 'code': 400})
+
+    # 保存文件
+    # file.save(os.path.join('./static/uploads', file.filename))
+
+    return jsonify({'message': 'ASR返回文本结果测试!', 'code': 200})
 
 
 @function.route('/AIFunc', methods=['POST'])
 @jwt_required()
 def AIFunc():
-    # user_id = get_jwt_identity()
     data = request.get_json()
     command = data['command']
     text = data['text']
-    prompt = ""
     if command == '续写':
         prompt = "请帮我续写以下内容，仅返回生成内容。" + text
     elif command == '润色':
