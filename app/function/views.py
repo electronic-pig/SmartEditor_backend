@@ -12,7 +12,6 @@ erniebot.access_token = os.getenv('ERNIE_BOT_ACCESS_TOKEN')
 
 
 @function.route('/ocr', methods=['POST'])
-@jwt_required()
 def ocr():
     # 检查是否有文件被上传
     if 'file' not in request.files:
@@ -31,7 +30,6 @@ def ocr():
 
 
 @function.route('/asr', methods=['POST'])
-@jwt_required()
 def asr():
     # 检查是否有文件被上传
     if 'file' not in request.files:

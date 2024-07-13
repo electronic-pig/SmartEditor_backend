@@ -150,7 +150,9 @@ def get_document_template():
 @jwt_required()
 def search_documents_by_user(title):
     user_id = get_jwt_identity()
-    docs = Documents.query.filter(Documents.user_id == user_id, Documents.title.like(f"%{title}%")).all()
+    docs = Documents.query.filter(Documents.user_id == user_id,
+                                  Documents.is_deleted == False,
+                                  Documents.title.like(f"%{title}%")).all()
     if not docs:
         return jsonify({'message': '未查询到匹配文档!', 'code': '400'})
     return jsonify({'documents': [doc.to_dict() for doc in docs], 'code': '200'})

@@ -9,4 +9,3 @@ flask_cors==4.0.1
 flask_jwt_extended==4.6.0
 flask_mail==0.10.0
 flask_redis==0.4.0
-redis==5.0.7
