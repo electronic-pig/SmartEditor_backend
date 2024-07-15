@@ -3,7 +3,7 @@ from time import sleep
 
 from dotenv import load_dotenv
 from flask import jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 import erniebot
 from . import function
 
@@ -61,7 +61,7 @@ def asr():
 
 
 @function.route('/AIFunc', methods=['POST'])
-# @jwt_required()
+@jwt_required()
 def AIFunc():
     data = request.get_json()
     command = data['command']

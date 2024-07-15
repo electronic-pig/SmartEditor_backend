@@ -1,9 +1,19 @@
+import json
+from datetime import datetime
+
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from database import db
+from database import *
 from . import document
 from .models import Documents
+
+
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return json.JSONEncoder.default(self, obj)
 
 
 # 创建文档
@@ -22,10 +32,17 @@ def create_document():
 @document.route('/<int:document_id>', methods=['GET'])
 @jwt_required()
 def get_document(document_id):
-    doc = Documents.query.get(document_id)
-    if doc is None:
-        return jsonify({'message': '查询失败!', 'code': '400'})
-    return jsonify({'document': doc.to_dict(), 'code': '200'})
+    cache_key = f"document:{document_id}"
+    cached_doc = redis_client.get(cache_key)
+    if cached_doc:
+        print('cache hit!')
+        return jsonify({'document': json.loads(cached_doc), 'code': '200'})
+    else:
+        doc = Documents.query.get(document_id)
+        if doc is None:
+            return jsonify({'message': '查询失败!', 'code': '400'})
+        redis_client.set(cache_key, json.dumps(doc.to_dict(), cls=CustomJSONEncoder))
+        return jsonify({'document': doc.to_dict(), 'code': '200'})
 
 
 # 查询用户的所有文档
@@ -50,6 +67,9 @@ def update_document(document_id):
     doc.title = data['title']
     doc.content = data['content']
     db.session.commit()
+    # 更新Redis缓存
+    cache_key = f"document:{document_id}"
+    redis_client.set(cache_key, json.dumps(doc.to_dict(), cls=CustomJSONEncoder))
     return jsonify({'message': '更新成功!', 'code': '200'})
 
 
@@ -62,6 +82,9 @@ def delete_document(document_id):
         return jsonify({'message': '查询失败!', 'code': '400'})
     db.session.delete(doc)
     db.session.commit()
+    # 清理Redis缓存
+    cache_key = f"document:{document_id}"
+    redis_client.delete(cache_key)
     return jsonify({'message': '删除成功!', 'code': '200'})
 
 
@@ -74,6 +97,9 @@ def favorite_document(document_id):
         return jsonify({'message': '查询失败!', 'code': '400'})
     doc.is_favorite = True
     db.session.commit()
+    # 更新Redis缓存
+    cache_key = f"document:{document_id}"
+    redis_client.set(cache_key, json.dumps(doc.to_dict(), cls=CustomJSONEncoder))
     return jsonify({'message': '收藏成功!', 'code': '200'})
 
 
@@ -86,6 +112,9 @@ def unfavorite_document(document_id):
         return jsonify({'message': '查询失败!', 'code': '400'})
     doc.is_favorite = False
     db.session.commit()
+    # 更新Redis缓存
+    cache_key = f"document:{document_id}"
+    redis_client.set(cache_key, json.dumps(doc.to_dict(), cls=CustomJSONEncoder))
     return jsonify({'message': '取消收藏成功!', 'code': '200'})
 
 
@@ -109,7 +138,11 @@ def delete_document_logic(document_id):
         return jsonify({'message': '查询失败!', 'code': '400'})
     doc.is_deleted = True
     doc.is_favorite = False
+    doc.is_template = False
     db.session.commit()
+    # 更新Redis缓存
+    cache_key = f"document:{document_id}"
+    redis_client.set(cache_key, json.dumps(doc.to_dict(), cls=CustomJSONEncoder))
     return jsonify({'message': '放入回收站成功!', 'code': '200'})
 
 
@@ -122,6 +155,9 @@ def recover_document(document_id):
         return jsonify({'message': '查询失败!', 'code': '400'})
     doc.is_deleted = False
     db.session.commit()
+    # 更新Redis缓存
+    cache_key = f"document:{document_id}"
+    redis_client.set(cache_key, json.dumps(doc.to_dict(), cls=CustomJSONEncoder))
     return jsonify({'message': '恢复成功!', 'code': '200'})
 
 
@@ -178,6 +214,9 @@ def set_document_template(document_id):
         return jsonify({'message': '查询失败!', 'code': '400'})
     doc.is_template = True
     db.session.commit()
+    # 更新Redis缓存
+    cache_key = f"document:{document_id}"
+    redis_client.set(cache_key, json.dumps(doc.to_dict(), cls=CustomJSONEncoder))
     return jsonify({'message': '另存为模板成功!', 'code': '200'})
 
 
@@ -190,5 +229,7 @@ def unset_document_template(document_id):
         return jsonify({'message': '查询失败!', 'code': '400'})
     doc.is_template = False
     db.session.commit()
+    # 更新Redis缓存
+    cache_key = f"document:{document_id}"
+    redis_client.set(cache_key, json.dumps(doc.to_dict(), cls=CustomJSONEncoder))
     return jsonify({'message': '撤销模板成功!', 'code': '200'})
-

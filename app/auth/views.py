@@ -11,6 +11,7 @@ from . import auth
 from .models import Users
 
 
+#  生成验证码并发送邮件
 @auth.route('/varify/<string:username>&<string:email>')
 def varify(username, email):
     # 生成一个6位数的验证码
@@ -26,6 +27,7 @@ def varify(username, email):
     return jsonify({'message': '验证码已发送，请注意查收！', 'code': 200})
 
 
+# 用户注册
 @auth.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -45,6 +47,7 @@ def register():
     return jsonify({'message': '用户注册成功！', 'code': 200})
 
 
+# 用户登录
 @auth.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -62,6 +65,7 @@ def login():
                     'data': {'access_token': access_token, 'username': user.username, 'email': user.email}})
 
 
+# 重置密码验证
 @auth.route("/reset_varify", methods=["GET"])
 @jwt_required()
 def reset_varify():
@@ -82,6 +86,7 @@ def reset_varify():
     return jsonify({'message': '验证码已发送，请注意查收！', 'code': 200})
 
 
+# 用户密码重置
 @auth.route("/reset_password", methods=["POST"])
 @jwt_required()
 def reset_password():
@@ -98,11 +103,3 @@ def reset_password():
     user.set_password(data['password'])
     db.session.commit()
     return jsonify({'message': '用户密码重置成功！', 'code': 200})
-
-
-@auth.route("/protected", methods=["GET"])
-@jwt_required()  # 这个装饰器要求请求必须携带有效的JWT令牌
-def protected():
-    # 使用get_jwt_identity访问当前用户的身份
-    current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user)
