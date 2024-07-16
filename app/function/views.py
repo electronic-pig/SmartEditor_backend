@@ -1,15 +1,17 @@
 import os
 from time import sleep
-
+import base64
+import requests
 from dotenv import load_dotenv
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required
 import erniebot
+
 from . import function
 
 load_dotenv()
 erniebot.api_type = "aistudio"
-erniebot.access_token = os.getenv('ERNIE_BOT_ACCESS_TOKEN')
+erniebot.access_token = os.getenv('ACCESS_TOKEN')
 
 
 @function.route('/ocr', methods=['POST'])
@@ -17,26 +19,33 @@ def ocr():
     # 检查是否有文件被上传
     if 'file' not in request.files:
         return jsonify({'message': '无文件上传!', 'code': 400})
-
     file = request.files['file']
-
     # 如果用户没有选择文件，浏览器也会提交一个空的文件部分，所以需要检查文件是否存在
     if file.filename == '':
         return jsonify({'message': '无文件上传!', 'code': 400})
-
-    # 保存文件
-    # file.save(os.path.join('./static/uploads', file.filename))
-
-    return jsonify({'message': '后端小模型OCR服务未启动！', 'code': 400})
-
-    sleep(2.13)
-    result = '''
-"文心一言"是百度公司开发的一款人工智能产品，它基于百度强大的搜索引擎和大数据技术，具备自然
-语言处理、知识图谱、机器学习等能力。文心一言可以为用户提供智能问答、文本分析、情感分析、机
-器翻译等多种服务，广泛应用于智能客服、内容推荐、智能写作等领域。
-    '''
-
-    return jsonify({'message': result, 'code': 200})
+    image_bytes = file.read()
+    image_base64 = base64.b64encode(image_bytes).decode('ascii')
+    # 设置鉴权信息
+    headers = {
+        "Authorization": f"token {os.getenv('ACCESS_TOKEN')}",
+        "Content-Type": "application/json"
+    }
+    # 设置请求体
+    payload = {
+        "image": image_base64  # Base64编码的文件内容或者文件链接
+    }
+    try:
+        resp = requests.post(url=os.getenv('OCR_API_URL'), json=payload, headers=headers)
+        resp.raise_for_status()  # 将引发异常，如果状态码不是 200-399
+        ocr_result = resp.json()["result"]
+        result = ''
+        for text in ocr_result["texts"]:
+            result += text["text"]
+            result += '\n'
+        return jsonify({'message': result, 'code': 200})
+    except Exception as e:
+        print(f"处理响应时发生错误: {e}")
+        return jsonify({'message': '后端小模型OCR服务未启动！', 'code': 400})
 
 
 @function.route('/asr', methods=['POST'])
