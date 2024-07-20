@@ -23,6 +23,7 @@ def ocr():
     # 如果用户没有选择文件，浏览器也会提交一个空的文件部分，所以需要检查文件是否存在
     if file.filename == '':
         return jsonify({'message': '无文件上传!', 'code': 400})
+    # 二进制读取文件内容
     image_bytes = file.read()
     image_base64 = base64.b64encode(image_bytes).decode('ascii')
     # 设置鉴权信息
@@ -60,13 +61,12 @@ def asr():
     if file.filename == '':
         return jsonify({'message': '无文件上传!', 'code': 400})
 
-    # 保存文件
-    # file.save(os.path.join('./static/uploads', file.filename))
-
+    # TODO：调用后端小模型ASR服务
+    sleep(1.33)
     return jsonify({'message': '后端小模型ASR服务未启动！', 'code': 400})
 
-    sleep(3.33)
-    return jsonify({'message': '早上八点我从北京到广州花了四百二十六元', 'code': 200})
+    # Demo：返回固定文本
+    # return jsonify({'message': '早上八点我从北京到广州花了四百二十六元', 'code': 200})
 
 
 @function.route('/AIFunc', methods=['POST'])
