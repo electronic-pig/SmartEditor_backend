@@ -3,7 +3,7 @@ from time import sleep
 import base64
 import requests
 from dotenv import load_dotenv
-from flask import jsonify, request
+from flask import jsonify, request, Response
 from flask_jwt_extended import jwt_required
 import erniebot
 
@@ -70,7 +70,7 @@ def asr():
 
 
 @function.route('/AIFunc', methods=['POST'])
-@jwt_required()
+# @jwt_required()
 def AIFunc():
     data = request.get_json()
     command = data['command']
@@ -92,7 +92,15 @@ def AIFunc():
     else:
         prompt = f"请以{data['tone']}的风格，{data['prompt']}" if data['tone'] else data['prompt']
 
-    response = erniebot.ChatCompletion.create(model="ernie-4.0",
-                                              messages=[{"role": "user", "content": prompt}])
+    def generate():
+        response = erniebot.ChatCompletion.create(model="ernie-4.0",
+                                                  messages=[{"role": "user", "content": prompt}],
+                                                  stream=True)
+        for chunk in response:
+            # 确保chunk.get_result()返回的是字符串
+            result = chunk.get_result()
+            if isinstance(result, bytes):
+                result = result.decode('utf-8')
+            yield f"data: {result}\n\n"
 
-    return jsonify({'message': response.get_result(), 'code': 200})
+    return Response(generate(), content_type='text/event-stream')
