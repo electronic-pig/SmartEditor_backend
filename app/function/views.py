@@ -76,21 +76,39 @@ def AIFunc():
     command = data['command']
     text = data['text']
     if command == '续写':
-        prompt = "请帮我续写以下内容，限制内容到400字以内，仅返回生成内容。" + text
+        prompt = ("这是从文档截取的一部分文本内容。\n" + text +
+                  "\n请帮我续写这部分内容，保持原有的写作风格和语气。续写内容应连贯且自然，长度约为两段，每段不少于100字。"
+                  "请确保续写部分与原文内容主题一致，并继续探讨相关话题。只需要续写内容，不需要返回其他内容。")
     elif command == '润色':
-        prompt = "请帮我润色以下内容，仅返回生成内容。" + text
+        prompt = ("这是从文档截取的一部分文本内容。\n" + text +
+                  "\n请帮我润色这部分内容，保持原有的写作风格和语气。润色后的内容应更加流畅、自然，并纠正任何语法或拼写错误。"
+                  "请确保内容的主题和信息不变。只需要返回润色后的内容，不需要返回其他内容。")
     elif command == '校对':
-        prompt = "请帮我校对以下内容，仅返回生成内容。" + text
+        prompt = ("这是从文档截取的一部分文本内容。\n" + text +
+                  "\n请帮我校对这部分内容，保持原有的写作风格和语气。校对后的内容应纠正所有语法、拼写和标点错误。"
+                  "请确保不改变原文的主题和信息。只需要返回校对后的内容，不需要返回其他内容。")
     elif command == '翻译':
-        prompt = "请帮我翻译以下内容，仅返回生成内容。" + text
+        prompt = ("这是从文档截取的一部分文本内容。\n" + text +
+                  "\n根据原有的语言，请帮我将这部分内容翻译成中文或英文，保持原有的写作风格和语气。"
+                  "翻译后的内容应准确传达原文的意思，并且自然流畅。只需要返回翻译后的内容，不需要返回其他内容。")
+    elif command == '内容简化':
+        prompt = ("这是一份文档的文本内容。\n" + text +
+                  "\n请帮我简化这些内容，使其更易于理解。保留关键信息和主要观点，去除冗余和复杂的表达。"
+                  "简化后的内容应保持原文的主题和信息不变，但更简洁明了。只需要返回简化后的内容，不需要返回其他内容。")
     elif command == '全文翻译':
-        prompt = "请帮我全文翻译以下内容，保留HTML标签，且仅返回生成的HTML内容。" + text
+        prompt = ("这是一份文档的文本内容。\n" + text +
+                  "\n根据原有的语言，请将这些内容翻译成中文或英文，保持原有的写作风格和语气。"
+                  "翻译后的内容应准确传达原文的意思，并且自然流畅。只需要返回翻译后的内容，不需要返回其他内容。")
     elif command == '全文总结':
-        prompt = '请帮我用一段话总结以下内容，仅返回生成内容。' + text
+        prompt = ("这是一份文档的文本内容。\n" + text +
+                  "\n请帮我总结这些内容，保持原有的写作风格和语气。"
+                  "总结后的内容应概括文档的主要观点和结论，并且简洁明了。只需要返回总结后的内容，不需要返回其他内容。")
     elif command == '重点提取':
-        prompt = '请帮我用一段话提取以下内容的重点，仅返回生成内容。' + text
+        prompt = ("这是一份文档的文本内容。\n" + text +
+                  "\n请帮我提取这些内容的重点信息。重点信息应包括主要观点、关键数据和重要结论。"
+                  "提取后的内容应简洁明了，涵盖文档的核心内容。只需要返回提取后的内容，不需要返回其他内容。")
     else:
-        prompt = f"请以{data['tone']}的风格，{data['prompt']}" if data['tone'] else data['prompt']
+        prompt = f"请采用{data['tone']}的生成风格，{data['prompt']}" if data['tone'] else data['prompt']
 
     def generate():
         response = erniebot.ChatCompletion.create(model="ernie-4.0",
@@ -113,8 +131,16 @@ def typography():
     font_size = data['font_size']
     line_spacing = data['line_spacing']
     paragraph = data['paragraph']
-    prompt = text + (f"将以上html内容重新排版为{title}的格式，要求字体为{font}，字号为{font_size}，行距为{line_spacing}，段落需要{paragraph}，"
-                     f"必须只返回生成后的html文本，禁止返回其他内容。")
+    prompt = (
+        f"这是一份文档的HTML文本内容。\n"
+        f"{text}\n"
+        f"请将上述HTML内容重新排版为{title}的格式。要求如下：\n"
+        f"- 字体：{font}\n"
+        f"- 字号：{font_size}\n"
+        f"- 行距：{line_spacing}\n"
+        f"- 段落：{paragraph}\n"
+        f"只需要返回生成后的HTML文本，不需要返回其他内容。"
+    )
 
     def generate():
         response = erniebot.ChatCompletion.create(model="ernie-4.0",
