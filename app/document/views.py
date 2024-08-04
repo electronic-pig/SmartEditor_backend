@@ -22,7 +22,7 @@ class CustomJSONEncoder(json.JSONEncoder):
 def create_document():
     user_id = get_jwt_identity()
     data = request.get_json()
-    new_document = Documents(user_id=user_id, title='未命名文档', content=data['content'])
+    new_document = Documents(user_id=user_id, title=data['title'], content=data['content'])
     db.session.add(new_document)
     db.session.commit()
     return jsonify({'message': '创建成功!', 'id': new_document.id, 'code': '200'})

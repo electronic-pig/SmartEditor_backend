@@ -97,10 +97,31 @@ def AIFunc():
                                                   messages=[{"role": "user", "content": prompt}],
                                                   stream=True)
         for chunk in response:
-            # 确保chunk.get_result()返回的是字符串
             result = chunk.get_result()
-            if isinstance(result, bytes):
-                result = result.decode('utf-8')
-            yield f"data: {result}\n\n"
+            yield f"{result}"
+
+    return Response(generate(), content_type='text/event-stream')
+
+
+@function.route('/typography', methods=['POST'])
+# @jwt_required()
+def typography():
+    data = request.get_json()
+    text = data['text']
+    title = data['title']
+    font = data['font']
+    font_size = data['font_size']
+    line_spacing = data['line_spacing']
+    paragraph = data['paragraph']
+    prompt = text + (f"将以上html内容重新排版为{title}的格式，要求字体为{font}，字号为{font_size}，行距为{line_spacing}，段落需要{paragraph}，"
+                     f"必须只返回生成后的html文本，禁止返回其他内容。")
+
+    def generate():
+        response = erniebot.ChatCompletion.create(model="ernie-4.0",
+                                                  messages=[{"role": "user", "content": prompt}],
+                                                  stream=True)
+        for chunk in response:
+            result = chunk.get_result()
+            yield f"{result}"
 
     return Response(generate(), content_type='text/event-stream')
