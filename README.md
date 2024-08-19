@@ -41,6 +41,8 @@
         <td align="center">mysql</td>
         <td align="center">redis</td>
         <td align="center">jwt</td>
+        <td align="center">erniebot</td>
+        <td align="center">paddlepaddle</td>
     </tr>
     <tr>
         <td align="center">
@@ -63,6 +65,41 @@
                 <img height="64px" src="https://github.com/user-attachments/assets/7ba63fb8-835e-4f28-8cf9-16e51b07127e"/>
             </a>
         </td>
+        <td align="center">
+            <a title="erniebot" href="https://ernie-bot-agent.readthedocs.io/zh-cn/stable/" target="_blank">
+                <img height="64px" src="https://github.com/user-attachments/assets/81a50ba6-eeae-48bf-9663-94284b9b3c4d"/>
+            </a>
+        </td>
+        <td align="center">
+            <a title="paddlepaddle" href="https://aistudio.baidu.com/overview" target="_blank">
+                <img height="64px" src="https://github.com/user-attachments/assets/93a555e1-83d0-4d0d-8042-1353aea65e97"/>
+            </a>
+        </td>
     </tr>
 </table>
 
+# 🚀 运行
+### 配置环境变量
+在项目根目录创建并编辑`.env`文件，填写相应的变量值
+```bash
+SQLALCHEMY_DATABASE_URI = <your_mysql_uri>
+REDIS_DATABASE_URI = <your_reids_uri>
+MAIL_USERNAME = <your_qqmail_number>
+MAIL_PASSWORD = <your_qqmail_server_password>
+JWT_SECRET = <any_secret>
+ACCESS_TOKEN = <your_baidu_access_token>
+OCR_API_URL = <your_baidu_ocr_api_url>
+```
+### 安装依赖
+```sh
+pip install -r requirements.txt
+```
+### 项目运行
+```sh
+python run.py
+```
+# 📐 系统架构
+![image](https://github.com/user-attachments/assets/cdf5d549-6873-407c-bc39-3884f3a0a930)
+
+# 📄 写在最后
+项目制作不易，如果它对你有帮助的话，请务必给作者点一个免费的⭐，万分感谢!🙏🙏🙏
