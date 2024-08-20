@@ -35,48 +35,9 @@
 
 # 🛠 技术栈
 
-<table>
-    <tr>
-        <td align="center">flask</td>
-        <td align="center">mysql</td>
-        <td align="center">redis</td>
-        <td align="center">jwt</td>
-        <td align="center">erniebot</td>
-        <td align="center">paddlepaddle</td>
-    </tr>
-    <tr>
-        <td align="center">
-            <a title="flask" href="https://flask.palletsprojects.com/en/3.0.x/" target="_blank">
-                <img height="64px" src="https://github.com/user-attachments/assets/e1ff55a9-f0ff-475d-8aef-82389bc5ebcc"/>
-            </a>
-        </td>
-        <td align="center">
-            <a title="mysql" href="https://www.mysql.com/cn/" target="_blank">
-                <img height="64px" src="https://github.com/user-attachments/assets/55d8be2b-18bb-4092-b557-fea3e8a7eef1"/>
-            </a>
-        </td>
-        <td align="center">
-            <a title="redis" href="https://redis.io/" target="_blank">
-                <img height="64px" src="https://github.com/user-attachments/assets/1e7eeaea-677e-4c46-a1fc-977a70857d89"/>
-            </a>
-        </td>
-        <td align="center">
-            <a title="jwt" href="https://jwt.io/" target="_blank">
-                <img height="64px" src="https://github.com/user-attachments/assets/7ba63fb8-835e-4f28-8cf9-16e51b07127e"/>
-            </a>
-        </td>
-        <td align="center">
-            <a title="erniebot" href="https://ernie-bot-agent.readthedocs.io/zh-cn/stable/" target="_blank">
-                <img height="64px" src="https://github.com/user-attachments/assets/81a50ba6-eeae-48bf-9663-94284b9b3c4d"/>
-            </a>
-        </td>
-        <td align="center">
-            <a title="paddlepaddle" href="https://aistudio.baidu.com/overview" target="_blank">
-                <img height="64px" src="https://github.com/user-attachments/assets/93a555e1-83d0-4d0d-8042-1353aea65e97"/>
-            </a>
-        </td>
-    </tr>
-</table>
+| [flask](https://flask.palletsprojects.com/en/3.0.x/) | [mysql](https://www.mysql.com/cn/) | [redis](https://redis.io/) | [jwt](https://jwt.io/) | [erniebot](https://ernie-bot-agent.readthedocs.io/zh-cn/stable/) | [paddlepaddle](https://aistudio.baidu.com/overview) |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| [<img src="https://github.com/user-attachments/assets/e1ff55a9-f0ff-475d-8aef-82389bc5ebcc" alt="flask" height="50px"/>](https://flask.palletsprojects.com/en/3.0.x/) | [<img src="https://github.com/user-attachments/assets/55d8be2b-18bb-4092-b557-fea3e8a7eef1" alt="mysql" height="50px"/>](https://www.mysql.com/cn/) | [<img src="https://github.com/user-attachments/assets/1e7eeaea-677e-4c46-a1fc-977a70857d89" alt="redis" height="50px"/>](https://redis.io/) | [<img src="https://github.com/user-attachments/assets/7ba63fb8-835e-4f28-8cf9-16e51b07127e" alt="jwt" height="50px"/>](https://jwt.io/) | [<img src="https://github.com/user-attachments/assets/81a50ba6-eeae-48bf-9663-94284b9b3c4d" alt="erniebot" height="50px"/>](https://ernie-bot-agent.readthedocs.io/zh-cn/stable/) | [<img src="https://github.com/user-attachments/assets/93a555e1-83d0-4d0d-8042-1353aea65e97" alt="paddlepaddle" height="50px"/>](https://aistudio.baidu.com/overview) |
 
 # 🚀 运行
 ### 配置环境变量
