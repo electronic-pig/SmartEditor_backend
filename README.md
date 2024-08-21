@@ -4,7 +4,7 @@
     </p>
     
 ![GitHub License](https://img.shields.io/github/license/electronic-pig/SmartEditor_backend)
-![node.js version](https://img.shields.io/badge/nodejs-18+-orange.svg)
+![node.js version](https://img.shields.io/badge/python-3.8+-orange.svg)
 ![GitHub Repo stars](https://img.shields.io/github/stars/electronic-pig/SmartEditor_backend)
 
 <h1 align="center">妙笔 · 智能编辑器</h1>
