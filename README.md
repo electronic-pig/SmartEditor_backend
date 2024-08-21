@@ -1,33 +1,33 @@
 <div align="center">
     <p align="center">
-        <img src="https://github.com/user-attachments/assets/2120ff94-8c29-41ff-8814-341137e026d1" alt="logo" width="200" />
+        <img src="https://github.com/user-attachments/assets/c7324129-02d4-48e9-af12-f0541f1421b2" alt="logo" width="200" />
     </p>
     
 ![GitHub License](https://img.shields.io/github/license/electronic-pig/SmartEditor)
-![node.js version](https://img.shields.io/badge/python-3.8+-orange.svg)
+![node.js version](https://img.shields.io/badge/nodejs-18+-orange.svg)
 ![GitHub Repo stars](https://img.shields.io/github/stars/electronic-pig/SmartEditor)
 
 <h1 align="center">妙笔 · 智能编辑器</h1>
 </div>
 
-# ✨ 简介
-
-**妙笔** —— 基于大小模型的在线文档富文本编辑器
-
 > 2024年中国软件杯A10赛题
 
-后端仓库请移步[SmartEditor](https://github.com/electronic-pig/SmartEditor)
+# ✨ 简介
+
+**妙笔** —— 基于大小模型的在线文档富文本编辑器，通过结合AI技术，为用户提供了一个全面、高效的文档编辑平台。**妙笔**不仅支持智能润色、多媒体信息提取和智能格式排版等核心功能，还提供了用户友好的交互界面和安全的文档管理体验，极大地提升了内容创作的效率和质量。
+
+后端仓库请移步[SmartEditor_backend](https://github.com/electronic-pig/SmartEditor_backend)
 
 # 🎉 特性
 
-## 整体功能
+## 核心功能
 
 - 用户认证
 - 文档管理
 - 富文本编辑
 - AI功能
   
-## 赛题要求
+## AI辅助
 
 - 智能润色
 - 多媒体信息提取
